@@ -21,6 +21,17 @@ The stub writes `rfid = 2`, magic `0x007B`, version `0x0065` and 14 hex chars of
 slot record, so the CFW's own parsers decode third-party tags and the spool shows up with colour/type.
 Device reports firmware `CV1.3.863` (leading `C` = community build) instead of stock `V1.3.863`.
 
+## Stack
+
+| Layer | What is used |
+|---|---|
+| Device | Anycubic ACE Pro (Gen 1): GD32F303 (Arm Cortex-M4) running the stock FreeRTOS-based firmware `V1.3.863`; MFRC522-class reader reachable only through the firmware's own primitives (`read_reg` `0x08019D12`, `write_reg` `0x08019E1C`, tag ID `0x0800A6A0`); per-slot records of 164 B at `0x20006518` |
+| Firmware work | Arm Thumb-2 assembly (`arm-none-eabi-as` / `ld` / `objcopy`, `-mcpu=cortex-m4 -mthumb`), byte-level patching in Python 3 (`struct`, `hashlib`), md5 + CRC-16/MCRF4XX verification, position-independent stub (no absolute branches) |
+| Flashing | `ace_flash.py` — Python 3 + pyserial, implementing the ACE IAP wire frame (`FF AA | len(u16 LE) | payload | crc16 | FE`, 64-byte chunks, staging base `0x08024000`), run over the printer's serial port |
+| Printer side | Klipper / Moonraker HTTP API (`POST /server/files/upload`, `printer/objects/query`), stock `ACE_EXT_*` G-code commands used for the drying-stop / FW-release / FW-resume sequence |
+| Host integration | multiACE Klipper module (`klippy/extras/ace.py`) and the printer screen — both consume the decoded tag from the slot record |
+| Verification | md5 / crc16 sums, disassembly, and live checks via `ACE_EXT_RAW METHOD=get_filament_info` |
+
 ## Files
 
 | File | What it is | md5 | Size |
