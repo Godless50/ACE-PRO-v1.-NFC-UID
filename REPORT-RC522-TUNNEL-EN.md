@@ -85,6 +85,10 @@ There is one reader/antenna channel per slot. The ACE 2 driver's
 
 ## 6. Live verification
 
+> **Operational note:** the antenna sees a spool's tag only while the filament is being
+> loaded — the loader rotates the spool so the tag passes the coil. A tag read is therefore
+> meaningful right after a normal load/заправка; a dormant spool may sit with its tag out of range.
+
 > **UID convention:** the table's *UID* column is the ISO14443-3 UID (page 0 bytes 0..2
 > and 4..7; byte 3 is `BCC0` and byte 8 starts the next page). The raw 16 bytes are page 0
 > exactly as read.
