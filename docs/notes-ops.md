@@ -32,6 +32,33 @@ python3 artefacts_build_rc522_tunnel.py ACE_V1.3.863_20260716.bin /tmp/tunnel_op
 
 ---
 
+## 0b. Status — device acceptance CLOSED (2026-09-29)
+
+`CV1.3.871` is the **verified reference and the fallback** (ruling R18):
+
+* `select-scan` returns `SELECT=0` on **all four readers**;
+* page-0 reads are full 16-byte frames (`bits=0x80`) and their UIDs match an
+  **independent phone read** of the tags (ruling R19 also confirmed
+  `reader = physical coil`: reader 0 = coil 1, reader 1 = coil 3);
+* the root cause of the earlier per-reader failures was the **antenna path**,
+  not the RX extraction: the unconditional `TxControlReg |= 3` write (round 4),
+  the per-slot line selection (round 6) and the host register ordering
+  (TxModeReg -> RxModeReg -> BitFraming) are what made the exchange work.  A
+  tag parked at a channel is now read reliably, and the ACE stays `ready`.
+
+A round-7 attempt that replaced the working firmware SELECT cascade
+(`0x0800E314`) with its own REQA/anticollision/SELECT pipeline, added a
+15-byte `SCAN RECORD` in the RC522 FIFO and a retry loop was built and tested
+offline, then **reverted** on this ruling: the verified RX path, antenna
+bring-up and op contract stay exactly as in `CV1.3.871`.  That work (and the
+record-aware `select-scan`) is preserved in git history, commit `3d598a3`,
+should a future image want additive per-stage diagnostics.
+
+Any later version (`CV1.3.872`+) must be re-accepted on a live unit before it
+replaces the reference.
+
+---
+
 ## 0. Fix history
 
 ### Round 6 — per-slot selection re-derived; every reply restores the state
@@ -704,8 +731,12 @@ ACE_EXT_RAW METHOD=get_filament_info INDEX=0 FORCE=1 ACE=0      # unchanged tag 
 
 ### 7.8 Rollback
 
-Reflash `ACE_V1.3.863_cfw_uid.bin` (md5
-`6148cfc52431fc235536c6d64b5334ef`, 113828 B, crc16 `0xAE92`).
+Reflash the verified tunnel reference `ACE_V1.3.863_tunnel_ops.bin`
+(`CV1.3.871`, md5 `219df3df77f7c7e1e15a79d580a2379e`, 114632 B, crc16
+`0x1AC9`, 804 B stub, 56 B headroom), or `ACE_V1.3.863_cfw_uid.bin` (md5
+`6148cfc52431fc235536c6d64b5334ef`, 113828 B, crc16 `0xAE92`) to return to the
+UID-only image.  Ruling R18: `CV1.3.871` stays the accepted reference until a
+later image is re-accepted.
 
 ---
 
@@ -723,13 +754,14 @@ This stub is 804 B → image 114632 B, **56 B under the ceiling**.
 
 ## 9. Risks / open items
 
-* **Round 6 is the fix to be confirmed on device.**  The selection re-derivation
-  matches the firmware's own calls (line = slot = reader, §6) and the antenna
-  write now preserves bits (`0x14 |= 3`), with a mode-1 retry behind the
-  select-only attempt.  If op 6 still fails on a channel whose stock read
-  succeeds, run `probe_ntag.py select-scan` inside one op-7 hold (§7.4) and
-  send the stage registers (§7.6) — they say whether the failure is REQA,
-  anticollision/SELECT or SPI.
+* **Round 6 is device-verified (§0b).**  The selection re-derivation matches
+  the firmware's own calls (line = slot = reader, §6) and the antenna write
+  preserves bits (`0x14 |= 3`); the earlier failures were the antenna path.
+  If a reader ever fails while its stock read succeeds, run
+  `probe_ntag.py select-scan` inside one op-7 hold (§7.4) and send the stage
+  registers (§7.6) — they say whether the failure is REQA,
+  anticollision/SELECT or SPI.  An RX-path rework is *not* part of this
+  version; the round-7 experiment lives in git history (`3d598a3`).
 * **The probe sequence matters**: never kick stock recognition (`INDEX=0..3`)
   right before a tunnel SELECT — the kicked action races the stub for ~100 ms.
   Use one acquire/scan/release sweep.
