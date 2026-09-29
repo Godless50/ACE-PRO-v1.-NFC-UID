@@ -5,6 +5,8 @@ how we got there, what works today, and what is still open.
 
 ---
 
+> **CORRECTION (2026-09-29):** the "two chips, one antenna per pair of slots" model below is **superseded**. On Gen 1 each slot has its own antenna/reader channel; the tunnel address uses `reader` = slot index (0→spool 1, 1→spool 3, 2→spool 2, 3→spool 4). See `REPORT-RC522-TUNNEL-EN.md`.
+
 ## 1. Result in one paragraph
 
 The stock ACE Pro firmware only understands genuine Anycubic spools. We made an ACE Pro (gen 1)
