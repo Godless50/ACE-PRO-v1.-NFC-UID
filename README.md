@@ -9,6 +9,13 @@ hardware modifications.
 * 🇬🇧 **[REPORT-EN.md](REPORT-EN.md)** — full technical report (route analysis, disassembly contracts,
   reproductions, appendices).
 
+## On a live printer
+
+The picker of the **multiACE** web panel showing a tag read on a Gen-1 ACE Pro:
+`Read RFID`, SKU `G00-G00` taken from the tag itself.
+
+![ACE 1 / Slot 4 - set filament, Read RFID](docs/photos/ace1-picker-read-rfid.jpg)
+
 ## Working route
 
 Base = public community firmware (**OpenCubic** / Simon-CR). Our fork adds:
