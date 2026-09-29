@@ -99,8 +99,8 @@ Page-0 read (`op7 hold → SELECT → READ(0x30, page 0) → op8 release`), `bit
 
 | reader | 16 bytes (page 0) | UID |
 |---|---|---|
-| 0 (spool 1) | `04 22 52 51 C8 2A 81 81 32 48 00 00 E1 10 6D 00` | `04 22 52 51 C8 2A 81` |
-| 1 (spool 3) | `53 42 70 D1 B5 00 01 01 65 48 00 00 E1 10 12 00` | `53 42 70 D1 B5 00 01` |
+| 0 (spool 1) | `04 22 52 FC 51 C8 2A 81 32 48 00 00 E1 10 6D 00` | `04 22 52 51 C8 2A 81` |
+| 1 (spool 3) | `53 42 70 E9 D1 B5 00 01 65 48 00 00 E1 10 12 00` | `53 42 70 D1 B5 00 01` |
 | 2 (spool 2) | same as reader 0 | `04 22 52 51 C8 2A 81` |
 | 3 (spool 4) | same as reader 1 | `53 42 70 D1 B5 00 01` |
 
