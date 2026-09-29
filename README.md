@@ -69,8 +69,9 @@ Known-good image: `ACE_V1.3.863_tunnel_ops.bin` (md5 `219df3df77f7c7e1e15a79d580
 | `artefacts_stub4.s`, `artefacts_stub_tunnel5.s`, `artefacts_build_tunnel5.py` | stub sources and builder | — | — |
 
 Additional routes, measurements, host-side (multiACE `klippy/extras/ace.py`) changes and hard-won
-constraints (reader = slot index — one antenna per slot on Gen 1; the earlier
-"pairs 1&3 / 2&4" assumption was wrong; see `REPORT-RC522-TUNNEL-EN.md`) are described in the report.
+constraints (two antennas with two bays each; the reader channel maps as
+0,1,2,3 -> 0,2,1,3, and a bay's tag is readable only while the other spool on its
+antenna is out of the field; see `REPORT-RC522-TUNNEL-EN.md`) are described in the report.
 
 ## Credits
 

@@ -55,18 +55,31 @@ JSON writer): `{"id":%d,"result":{"code":%d},"msg":"ok"}`.
 | 6 | REQA + anticollision + SELECT | — | 0 = card ACTIVE |
 | 7 / 8 | acquire (hold) / release | — | saved state / 0 |
 
-## 4. Antenna map (Gen 1 — owner-confirmed)
+## 4. Antennas and reader channels (Gen 1 — owner-confirmed)
 
-| `reader` | antenna | spool |
-|---|---|---|
-| 0 | antenna 0 | spool 1 |
-| 1 | antenna 1 | spool 3 |
-| 2 | antenna 2 | spool 2 |
-| 3 | antenna 3 | spool 4 |
+Two reader antennas, two spool bays each — four virtual slots:
 
-There is one reader/antenna channel per slot. The ACE 2 driver's
-`reader = 1 if slot >= 2 else 0` does **not** apply to Gen 1, and the earlier
-"pairs 1&3 / 2&4" guess is wrong.
+| bay (case label) | ACE slot index | reader channel | antenna |
+|---|---|---|---|
+| 1 | 0 | 0 | 1 |
+| 2 | 1 | 2 | 1 |
+| 3 | 2 | 1 | 2 |
+| 4 | 3 | 3 | 2 |
+
+Two numbering systems matter, and they are not the same:
+
+* the **ACE slot index** (what `get_filament_info`/`filament_recognition` address)
+  follows the bay order — 0,1,2,3 for bays 1,2,3,4. Its same-antenna partner is
+  `slot ^ 1`;
+* the **reader channel** inside a packed tunnel index maps as
+  `0,1,2,3 → 0,2,1,3` (`reader = ((slot & 1) << 1) | ((slot >> 1) & 1)`) — channels
+  0 and 2 are antenna 1, channels 1 and 3 are antenna 2. Its partner is
+  `channel ^ 2`.
+
+Only one tag per antenna can be in the field at a time: to read one bay's tag,
+the other spool of the same antenna must be rotated out of the field or removed.
+The ACE 2 model (`reader = 1 if slot >= 2 else 0`) does not apply, and neither
+does the earlier "one antenna per slot" phrasing.
 
 ## 5. What made it work (bring-up essentials)
 
