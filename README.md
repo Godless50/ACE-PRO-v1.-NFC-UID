@@ -28,6 +28,23 @@ The stub writes `rfid = 2`, magic `0x007B`, version `0x0065` and 14 hex chars of
 slot record, so the CFW's own parsers decode third-party tags and the spool shows up with colour/type.
 Device reports firmware `CV1.3.863` (leading `C` = community build) instead of stock `V1.3.863`.
 
+## RC522 tunnel (Gen 1)
+
+Beyond the UID stub, the same image family carries a **tunnel to the reader chip**:
+an early 4-byte hook at `VA 0x080144F2` plus an appended stub (`VA 0x08023CA4`, 804 B)
+that answers a *packed* index on the `filament_recognition` command with reader
+operations — register read/write, FIFO, PCD command, SELECT, page reads — returning
+results in the reply's `code` field. Ordinary slot indices replay the stock call
+byte-for-byte. Verified live: `SELECT` succeeds on all four antennas and page 0 reads
+back 16 bytes whose UID matches a phone NFC reader.
+
+Full design, host contract (packed index, ops 0–8), the owner-confirmed antenna map
+(`reader` = slot index), bring-up gotchas, and the reproduce commands:
+**[`REPORT-RC522-TUNNEL-EN.md`](REPORT-RC522-TUNNEL-EN.md)**.
+
+Known-good image: `ACE_V1.3.863_tunnel_ops.bin` (md5 `219df3df77f7c7e1e15a79d580a2379e`,
+114632 B, crc16 `0x1AC9`, reports `CV1.3.871`).
+
 ## Stack
 
 | Layer | What is used |
@@ -43,7 +60,8 @@ Device reports firmware `CV1.3.863` (leading `C` = community build) instead of s
 
 | File | What it is | md5 | Size |
 |---|---|---|---|
-| `ACE_V1.3.863_cfw_uid.bin` | **working image**: community firmware (CFW) + our UID stub | `6148cfc52431fc235536c6d64b5334ef` | 113828 |
+| `ACE_V1.3.863_cfw_uid.bin` | **working image (UID stub only)**: community firmware (CFW) + our UID stub | `6148cfc52431fc235536c6d64b5334ef` | 113828 |
+| `ACE_V1.3.863_tunnel_ops.bin` | **known-good tunnel image**: CFW + UID stub + RC522 tunnel (\`CV1.3.871\`) | `219df3df77f7c7e1e15a79d580a2379e` | 114632 |
 | `ACE_V1.3.863_20260716.bin` | base — public CFW (unmodified, for rebuilds) | `9f7b9a678a96caf98d6a08842d3ff971` | 113720 |
 | `ACE_V1.3.863_tunnel5.bin` | earlier variant on **stock** FW (register tunnel) | `402b4b23c420b6cbd72b89dac70a2286` | 105652 |
 | `ACE_V1.3.863_stock.bin` | clean stock (rollback) | `dcd04589dcadd5b4feab66d33e772531` | 105652 |
@@ -51,8 +69,8 @@ Device reports firmware `CV1.3.863` (leading `C` = community build) instead of s
 | `artefacts_stub4.s`, `artefacts_stub_tunnel5.s`, `artefacts_build_tunnel5.py` | stub sources and builder | — | — |
 
 Additional routes, measurements, host-side (multiACE `klippy/extras/ace.py`) changes and hard-won
-constraints (one antenna per slot pair `1&3` / `2&4`, no slot separation by driver, unreadable
-"neighbour" tag filtering) are described in the report.
+constraints (reader = slot index — one antenna per slot on Gen 1; the earlier
+"pairs 1&3 / 2&4" assumption was wrong; see `REPORT-RC522-TUNNEL-EN.md`) are described in the report.
 
 ## Credits
 

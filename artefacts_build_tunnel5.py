@@ -6,7 +6,7 @@ BASE=0x08008000
 SRC='./ACE_V1.3.863_stock.bin'
 SRC_MD5='dcd04589dcadd5b4feab66d33e772531'
 OUT='./ACE_V1.3.863_tunnel5.bin'
-TMP='/tmp/opencode'
+TMP='.'
 CAVE_LO,CAVE_HI=0x08020000,0x08021C00
 md5=lambda b: hashlib.md5(b).hexdigest()
 def crc16(data):

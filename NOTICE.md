@@ -2,8 +2,9 @@
 
 Our own work in this repository — the documentation (`README-RU.md`, `REPORT-EN.md`,
 `README.md`), the flasher (`ace_flash.py`), the stub sources (`artefacts_stub4.s`,
-`artefacts_stub_tunnel5.s`), the builder (`artefacts_build_tunnel5.py`) and the
-patch recipe — is licensed under **GPL-3.0** (see `LICENSE`).
+`artefacts_stub_tunnel5.s`, `artefacts_stub_uid_cfw.s`, `artefacts_stub_rc522.s`),
+the builders (`artefacts_build_tunnel5.py`, `artefacts_build_rc522_tunnel.py`),
+the probe tools (`probe/`) and the patch recipe — is licensed under **GPL-3.0** (see `LICENSE`).
 
 The **firmware images are third-party material and are NOT covered by that grant**:
 
@@ -14,6 +15,9 @@ The **firmware images are third-party material and are NOT covered by that grant
 * `ACE_V1.3.863_cfw_uid.bin` — the same CFW with our 4-byte hook and 108-byte
   appended stub. Same provenance and same caveat as the base image.
 * `ACE_V1.3.863_tunnel5.bin` — derived the same way from the vendor image.
+* `ACE_V1.3.863_tunnel_ops.bin` — the CFW plus our parser stub **and** the RC522
+  tunnel stub (hook `0x080144F2`, stub `0x08023CA4`). Same provenance and same
+  caveat as the base image.
 * `ACE_V1.3.863_stock.bin` — the **vendor (Anycubic)** firmware image, included
   solely as the rollback reference. © Anycubic; no licence is granted here.
 
