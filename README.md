@@ -64,3 +64,11 @@ on theirs and given back to the community.
 Firmware images are provided **as-is, for research and interoperability purposes**. Flashing is at your
 own risk; a failed flash may brick the device. `ACE_V1.3.863_stock.bin` is the original vendor image and
 is included only as a rollback reference — all rights belong to Anycubic.
+
+## Licence
+
+Our own files here (documentation, flasher, stub sources, patch recipe) are
+**GPL-3.0** — full text in `LICENSE`. The **firmware images are third-party material**
+and are *not* covered by that grant: the community firmware comes from OpenCubic
+(which publishes no licence file) and the clean image is Anycubic's vendor firmware
+(see `NOTICE.md`).
